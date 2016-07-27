@@ -30,8 +30,8 @@ class RobotControl
 
 		// sampleControlMechanism(barHeights,blockHeights);
 		 
-		 //controlMechanismForScenarioA(barHeights, blockHeights);
-		  controlMechanismForScenarioB(barHeights, blockHeights);
+		 controlMechanismForScenarioA(barHeights, blockHeights);
+		 // controlMechanismForScenarioB(barHeights, blockHeights);
 		 // controlMechanismForScenarioC(barHeights, blockHeights);
 		 
 	     
@@ -217,6 +217,7 @@ class RobotControl
 	   public void controlMechanismForScenarioA(int barHeights[], int blockHeights[])
 	   {
 		   // Initial variable declaration 
+			// Initial variable declaration 
 			int armHeight = 2;
 			int armWidth = 1;
 			int armDepth = 0;
@@ -229,7 +230,8 @@ class RobotControl
 			boolean firstTime = true;
 			boolean lowestArmStatus = false;
 			
-			int ascendedBarHeights[] = barHeights;
+			int[] ascendedBarHeights;
+			ascendedBarHeights = barHeights.clone();
 			Arrays.sort(ascendedBarHeights);
 			
 			for(int currentBlock = 0; currentBlock <= 3; currentBlock++) // Four block, so it should be 4
@@ -281,7 +283,7 @@ class RobotControl
 				 * STEP #5
 				 * */
 				// After it got the block, lift the arm...
-			     while (armDepth > 0)
+			     while (armDepth >= (armHeight - barHeights[4] - blockHeights[currentBlock]))
 			     {
 			         r.raise();
 			         armDepth--;
@@ -299,7 +301,7 @@ class RobotControl
 			         armWidth--;
 			     }
 			     System.out.println("#4, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-			     
+
 			     /*
 					 * STEP #7
 					 * */
@@ -308,6 +310,7 @@ class RobotControl
 			     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
 			     if(!lowestArmStatus)
 			     {
+			    	 System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
 				     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
 				     {
 				    	 armHeight--;
@@ -338,133 +341,11 @@ class RobotControl
 			}
 			
 			
-			
 	   }
 	   
 	   public void controlMechanismForScenarioB(int barHeights[], int blockHeights[])
 	   {
-		// Initial variable declaration 
-					int armHeight = 2;
-					int armWidth = 1;
-					int armDepth = 0;
-					
-					int currentBar  = 0;
-					int initSpace = 3;
-					int sourceHeight = 12;
-					int blockHeight = 3;
-					int extendLength = 9; // First-time extension of the arm
-					boolean firstTime = true;
-					boolean lowestArmStatus = false;
-					
-					int[] ascendedBarHeights;
-					ascendedBarHeights = barHeights.clone();
-					Arrays.sort(ascendedBarHeights);
-					
-					for(int currentBlock = 0; currentBlock <= 3; currentBlock++) // Four block, so it should be 4
-					{
-						/*
-						 * STEP #1
-						 * */
-						if(firstTime)
-						{
-							// Reach its arm to enough height in the first round.
-							while ((armHeight - armDepth) <= sourceHeight)
-							{
-								armHeight++;
-								r.up();
-							}
-							
-							firstTime = false;
-						}
 
-						/*
-						 * STEP #2
-						 * */
-						while (armWidth <= extendLength)
-						{
-							armWidth++;
-							r.extend();
-						}
-						
-						System.out.println("#1, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-						
-						/*
-						 * STEP #3
-						 * */
-						while(armDepth < 10 - sourceHeight)
-						{
-							armDepth++;
-							r.lower();
-						}
-						
-						System.out.println("#2, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-						
-						/*
-						 * STEP #4
-						 * */
-						// Now it should reach the block, catch it!
-						r.pick();
-						
-						/*
-						 * STEP #5
-						 * */
-						// After it got the block, lift the arm...
-					     while (armDepth >= (armHeight - barHeights[4] - blockHeights[currentBlock]))
-					     {
-					         r.raise();
-					         armDepth--;
-					     }
-					     
-					     System.out.println("#3, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-					    
-					     /*
-					      * STEP #6
-							 * */
-					     // Move to where it needs to
-					     while ((armWidth - initSpace - currentBlock) > 0 )
-					     {
-					         r.contract();
-					         armWidth--;
-					     }
-					     System.out.println("#4, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-
-					     /*
-							 * STEP #7
-							 * */
-					     // Now move down to the target
-					     // We need to detect the arm is in the lowest allowance or not.
-					     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
-					     if(!lowestArmStatus)
-					     {
-					    	 System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
-						     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
-						     {
-						    	 armHeight--;
-						    	 r.down();
-						     }
-						     lowestArmStatus = true;
-					     }
-					     else
-					     {
-					    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
-					    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
-					    	 {
-					    		 armDepth++;
-					    		 r.lower();
-					    	 }
-					     }
-					     System.out.println("#5, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-					     
-					     /*
-							 * STEP #8
-							 * */
-					     // Release the block
-					     r.drop();
-					     
-					     // Update source's height
-					     sourceHeight = sourceHeight - blockHeight;
-					     currentBar++;
-					}
 	   }
 	   
 	   public void controlMechanismForScenarioC(int barHeights[], int blockHeights[])
