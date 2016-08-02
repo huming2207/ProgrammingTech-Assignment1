@@ -519,10 +519,32 @@ class RobotControl
 			boolean firstRound = true;
 			boolean lowestArmStatus = false;
 			boolean partAB = true;
-
 			int[] ascendedBarHeights = new int[20];
-			ascendedBarHeights = barHeights.clone();
-			Arrays.sort(ascendedBarHeights);
+			
+			if(blockHeights.length >= barHeights.length)
+			{
+				// This is a workaround for Round 8, since the ascendedBarHeight will be overflow. (Blocks are more than bars)
+				// It's stupid but it works...
+				int[] ascendedBarHeightsClean;
+				ascendedBarHeightsClean = barHeights.clone();
+				Arrays.sort(ascendedBarHeightsClean);
+				
+				
+				for(int i = 0; i < ascendedBarHeightsClean.length; i++)
+				{
+					ascendedBarHeights[i] = ascendedBarHeightsClean[i];
+				}
+				
+				for(int i = ascendedBarHeightsClean.length; i < ascendedBarHeights.length; i++)
+				{
+					ascendedBarHeights[i] = 0;
+				}
+			}
+			else
+			{
+				ascendedBarHeights = barHeights.clone();
+				Arrays.sort(ascendedBarHeights);
+			}
 			
 			int sourceHeight = 0;
 			for(int i : blockHeights)
