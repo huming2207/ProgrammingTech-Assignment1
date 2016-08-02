@@ -30,9 +30,9 @@ class RobotControl
 
 		// sampleControlMechanism(barHeights,blockHeights);
 		 
-		 controlMechanismForScenarioA(barHeights, blockHeights);
+		 // controlMechanismForScenarioA(barHeights, blockHeights);
 		 // controlMechanismForScenarioB(barHeights, blockHeights);
-		 // controlMechanismForScenarioC(barHeights, blockHeights);
+		  controlMechanismForScenarioC(barHeights, blockHeights);
 		 
 	     
 
@@ -216,7 +216,7 @@ class RobotControl
 	   
 	   public void controlMechanismForScenarioA(int barHeights[], int blockHeights[])
 	   {
-		   // Initial variable declaration 
+		    // Initial variable declaration 
 			// Initial variable declaration 
 			int armHeight = 2;
 			int armWidth = 1;
@@ -229,6 +229,7 @@ class RobotControl
 			int extendLength = 9; // First-time extension of the arm
 			boolean firstTime = true;
 			boolean lowestArmStatus = false;
+			int[] limitBarHeights = {7,6,7,7};
 			
 			int[] ascendedBarHeights;
 			ascendedBarHeights = barHeights.clone();
@@ -249,6 +250,15 @@ class RobotControl
 					}
 					
 					firstTime = false;
+				}
+				else
+				{
+					System.out.println("Now depth is: " + armDepth);
+					while(armHeight <= blockHeights[currentBlock] + ascendedBarHeights[ascendedBarHeights.length - 1] - armDepth)
+					{
+						armHeight++;
+						r.up();
+					}
 				}
 
 				/*
@@ -283,12 +293,13 @@ class RobotControl
 				 * STEP #5
 				 * */
 				// After it got the block, lift the arm...
-			     while (armDepth >= (armHeight - barHeights[4] - blockHeights[currentBlock]))
+			     while (armDepth >= (armHeight - limitBarHeights[currentBar] - blockHeights[currentBlock]))
 			     {
+			    	 armDepth--;
 			         r.raise();
-			         armDepth--;
+			         
 			     }
-			     
+			     System.out.println("Step 5 - Now the depth is: " + armDepth);
 			     System.out.println("#3, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
 			    
 			     /*
@@ -297,8 +308,9 @@ class RobotControl
 			     // Move to where it needs to
 			     while ((armWidth - initSpace - currentBlock) > 0 )
 			     {
+			    	 armWidth--;
 			         r.contract();
-			         armWidth--;
+			         
 			     }
 			     System.out.println("#4, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
 
@@ -326,9 +338,10 @@ class RobotControl
 			    		 armDepth++;
 			    		 r.lower();
 			    	 }
+			    	 
 			     }
 			     System.out.println("#5, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
-			     
+			     System.out.println("Step 7 - Now the depth is: " + armDepth);
 			     /*
 					 * STEP #8
 					 * */
@@ -345,12 +358,430 @@ class RobotControl
 	   
 	   public void controlMechanismForScenarioB(int barHeights[], int blockHeights[])
 	   {
+		   			// Initial variable declaration 
+					// Initial variable declaration 
+					int armHeight = 2;
+					int armWidth = 1;
+					int armDepth = 0;
+					
+					int currentBar  = 0;
+					int initSpace = 3;
+					int sourceHeight = 12;
+					int blockHeight = 3;
+					int extendLength = 9; // First-time extension of the arm
+					boolean firstTime = true;
+					boolean lowestArmStatus = false;
+					
+					int[] ascendedBarHeights;
+					ascendedBarHeights = barHeights.clone();
+					Arrays.sort(ascendedBarHeights);
+					
+					for(int currentBlock = 0; currentBlock <= 3; currentBlock++) // Four block, so it should be 4
+					{
+						/*
+						 * STEP #1
+						 * */
+						if(firstTime)
+						{
+							// Reach its arm to enough height in the first round.
+							while (armHeight <= sourceHeight)
+							{
+								armHeight++;
+								r.up();
+							}
+							
+							firstTime = false;
+						}
+						else
+						{
+							System.out.println("Now depth is: " + armDepth);
+							while(armHeight <= blockHeights[currentBlock] + ascendedBarHeights[ascendedBarHeights.length - currentBar] - armDepth)
+							{
+								armHeight++;
+								r.up();
+							}
+						}
 
+						/*
+						 * STEP #2
+						 * */
+						while (armHeight < armDepth + barHeights[currentBar] + 1)
+						{
+							armDepth--;
+					        r.raise();
+						}
+						while (armWidth <= extendLength)
+						{
+							armWidth++;
+							r.extend();
+						}
+						
+						System.out.println("#1, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+						
+						/*
+						 * STEP #3
+						 * */
+						while(armDepth < 10 - sourceHeight)
+						{
+							armDepth++;
+							r.lower();
+						}
+						
+						System.out.println("#2, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+						
+						/*
+						 * STEP #4
+						 * */
+						// Now it should reach the block, catch it!
+						r.pick();
+						
+						/*
+						 * STEP #5
+						 * */
+						// After it got the block, lift the arm...
+					     while (armDepth >= (armHeight - 7 - blockHeights[currentBlock]))
+					     {
+					    	 armDepth--;
+					         r.raise();
+					         
+					     }
+					     System.out.println("Step 5 - Now the depth is: " + armDepth);
+					     System.out.println("#3, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+					    
+					     /*
+					      * STEP #6
+							 * */
+					     // Move to where it needs to
+					     while ((armWidth - initSpace - currentBlock) > 0 )
+					     {
+					    	 armWidth--;
+					         r.contract();
+					         
+					     }
+					     System.out.println("#4, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+
+					     /*
+							 * STEP #7
+							 * */
+					     // Now move down to the target
+					     // We need to detect the arm is in the lowest allowance or not.
+					     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
+					     if(!lowestArmStatus)
+					     {
+					    	 System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
+						     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
+						     {
+						    	 armHeight--;
+						    	 r.down();
+						     }
+						     lowestArmStatus = true;
+					     }
+					     else
+					     {
+					    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
+					    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
+					    	 {
+					    		 armDepth++;
+					    		 r.lower();
+					    	 }
+					    	 
+					     }
+					     System.out.println("#5, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+					     System.out.println("Step 7 - Now the depth is: " + armDepth);
+					     /*
+							 * STEP #8
+							 * */
+					     // Release the block
+					     r.drop();
+					     
+					     // Update source's height
+					     sourceHeight = sourceHeight - blockHeight;
+					     currentBar++;
+					}
+					
+					
 	   }
 	   
 	   public void controlMechanismForScenarioC(int barHeights[], int blockHeights[])
 	   {
-		   
+			// Initial variable declaration 
+			int armHeight = 2;
+			int armWidth = 1;
+			int armDepth = 0;
+			int currentBar  = 0;
+			int currentHugeBlock = 0; // Huge block means size-3 blocks
+			int rowOneHeight = 0;
+			int rowTwoHeight = 0;
+			int initSpace = 3;
+			int blockHeight = 3;
+			int extendLength = 9; // First-time extension of the arm
+			int reverseBlockIndex = blockHeights.length - 1; // Used as a reverse index of block array.
+			boolean firstRound = true;
+			boolean lowestArmStatus = false;
+			boolean partAB = true;
+
+			int[] ascendedBarHeights = new int[20];
+			ascendedBarHeights = barHeights.clone();
+			Arrays.sort(ascendedBarHeights);
+			
+			int sourceHeight = 0;
+			for(int i : blockHeights)
+			{
+				sourceHeight += i;
+			}
+			
+			// Detect the stage, 
+			// if the stage is A and/or B then the first two blocks' height should be 3.
+			
+			if(blockHeights[0] == 3 && blockHeights[1] == 3)
+			{
+				partAB = true;
+			}
+			else
+			{
+				partAB = false;
+			}
+			
+			for(int currentBlock = 0; currentBlock <= (blockHeights.length - 1); currentBlock++) // Four block, so it should be 4
+			{
+				/*
+				 * STEP #1
+				 * */
+				if(firstRound)
+				{
+					// Reach its arm to enough height in the first round.
+					while (armHeight <= sourceHeight)
+					{
+						armHeight++;
+						r.up();
+					}
+					
+					firstRound = false;
+				}
+				else
+				{
+					System.out.println("Now depth is: " + armDepth);
+					while(armHeight <= blockHeights[reverseBlockIndex] + ascendedBarHeights[ascendedBarHeights.length - currentBar] - armDepth)
+					{
+						armHeight++;
+						r.up();
+					}
+				}
+
+				/*
+				 * STEP #2
+				 * */
+				if(partAB)
+				{
+					while (armHeight < armDepth + barHeights[currentBar] + 1)
+					{
+						armDepth--;
+				        r.raise();
+					}
+				}
+				else
+				{
+					// TODO: Should be replaced by a better algorithm
+					while (armDepth > 0)
+					{
+						armDepth--;
+				        r.raise();
+					}
+				}
+				while (armWidth <= extendLength)
+				{
+					armWidth++;
+					r.extend();
+				}
+				
+				System.out.println("#1, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+				
+				/*
+				 * STEP #3
+				 * */
+				System.out.println("Source height: " + sourceHeight);
+				while(armDepth < (armHeight - sourceHeight - 1)) // Minus one is the thick of the horizontal arm
+				{
+					armDepth++;
+					r.lower();
+				}
+				
+				System.out.println("#2, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+				
+				/*
+				 * STEP #4
+				 * */
+				// Now it should reach the block, catch it!
+				r.pick();
+				
+			     // If it's NOT stage A or B, then raise the arm to highest
+			     // to avoid collision.
+			     if(!partAB)
+			     {
+			    	 while(armDepth > 0)
+				     {
+				    	 armDepth--;
+				    	 r.raise();
+				     }
+			     }
+			     
+				/*
+				 * STEP #5
+				 * */
+				// After it got the block, lift the arm...
+			     while (armDepth >= (armHeight - 7 - blockHeights[currentBlock]))
+			     {
+			    	 armDepth--;
+			         r.raise();
+			         
+			     }
+			     System.out.println("Step 5 - Now the depth is: " + armDepth);
+			     System.out.println("#3, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+			    
+			     /*
+			      * STEP #6
+					 * */
+			     // Move to where it needs to
+			     if(partAB)
+			     {
+			    	 while ((armWidth - initSpace - currentBlock) > 0 )
+				     {
+				    	 armWidth--;
+				         r.contract();
+				     }
+			     }
+			     else
+			     {
+			    	 System.out.println("Current block height: " + blockHeights[reverseBlockIndex]);
+			    	 switch(blockHeights[reverseBlockIndex])
+			    	 {
+			    	 	case 3:
+			    	 	{
+			    	 		System.out.println("Huge Block detected!");
+					    	 while ((armWidth - currentHugeBlock - 3) > 0 )
+						     {
+						    	 armWidth--;
+						         r.contract();
+						     }
+					    	 break;
+			    	 	}
+			    	 	
+			    	 	case 2:
+			    	 	{
+			    	 		while ((armWidth - 2) > 0)
+			    	 		{
+			    	 			armWidth--;
+			    	 			r.contract();
+			    	 		}
+			    	 		break;
+			    	 	}
+			    	 	
+			    	 	case 1:
+			    	 	{
+			    	 		while ((armWidth - 1) > 0)
+			    	 		{
+			    	 			armWidth--;
+			    	 			r.contract();
+			    	 		}
+			    	 		break;
+			    	 	}
+			    	 }
+			     }
+			     
+			     System.out.println("#4, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+
+			     /*
+					 * STEP #7
+					 * */
+			     // Now move down to the target
+			     // We need to detect the arm is in the lowest allowance or not.
+			     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
+			     if(partAB)
+			     {
+				     if(!lowestArmStatus)
+				     {
+				    	// System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
+					     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
+					     {
+					    	 armHeight--;
+					    	 r.down();
+					     }
+					     lowestArmStatus = true;
+				     }
+				     else
+				     {
+				    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
+				    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
+				    	 {
+				    		 armDepth++;
+				    		 r.lower();
+				    	 } 
+				     }
+			     }
+			     else
+			     {
+			    	switch(blockHeights[reverseBlockIndex])
+			    	{
+			    		case 3:
+			    		{
+					    	 while (armDepth <= (armHeight - (barHeights[currentHugeBlock] + blockHeights[reverseBlockIndex]) - 2))
+					    	 {
+					    		 armDepth++;
+					    		 r.lower();
+					    	 }
+			    			break;
+			    		}
+			    		case 2:
+			    		{
+			    			System.out.println("Current ROW TWO height: " + rowTwoHeight + " Est. arm length: " + (armHeight - (blockHeights[reverseBlockIndex] + rowTwoHeight + 1)));
+			    			while (armDepth < (armHeight - (blockHeights[reverseBlockIndex] + rowTwoHeight + 1)))
+						    {
+						    	armDepth++;
+						    	r.lower();
+						    } 
+			    			rowTwoHeight += blockHeights[reverseBlockIndex];
+			    			break;
+			    		}
+			    		case 1:
+			    		{
+			    			System.out.println("Current ROW ONE height: " + rowOneHeight + " Est. arm length: " + (armHeight - (blockHeights[reverseBlockIndex] + rowOneHeight + 1)));
+			    			while (armDepth < (armHeight - (blockHeights[reverseBlockIndex] + rowOneHeight + 1)))
+						    {
+						    	armDepth++;
+						    	r.lower();
+						    } 
+			    			rowOneHeight += blockHeights[reverseBlockIndex];
+			    			break;
+			    		}
+			    	}
+				     
+			     }
+			     System.out.println("#5, Depth: " + armDepth + " Height: " + armHeight + " Width: " + armWidth);
+			     System.out.println("Step 7 - Now the depth is: " + armDepth);
+			     /*
+					 * STEP #8
+					 * */
+			     // Release the block
+			     r.drop();
+			     
+
+			     
+			     
+			     // Update source's height
+			     sourceHeight = sourceHeight - blockHeights[reverseBlockIndex];
+			     currentBar++;
+			     
+			     // Plus 1 only if it's a huge block
+			     if(blockHeights[reverseBlockIndex] == 3)
+			     {
+			    	 System.out.println("Huge block index +1");
+			    	 currentHugeBlock++;
+			     }
+			     
+			     reverseBlockIndex--;
+			     
+
+			}
 	   }
 	   
 
