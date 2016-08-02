@@ -172,10 +172,10 @@ class RobotControl
 		     // For part (a) all bars are initially set to 7
 		     // For Parts (b) and (c) you must extract this value from the array barHeights
 
-		     int currentBar  = 0;             
+		     int barIndex  = 0;             
 
 		     // lowering third arm
-		     while ( (h - 1) - d - blockHt > barHeights[currentBar] )   
+		     while ( (h - 1) - d - blockHt > barHeights[barIndex] )   
 		     {
 		         r.lower();
 		         d++;
@@ -187,8 +187,8 @@ class RobotControl
 		     // dropping the block      
 		     r.drop();
 
-		     // The height of currentBar increases by block just placed    
-		     barHeights[currentBar] += blockHt;
+		     // The height of barIndex increases by block just placed    
+		     barHeights[barIndex] += blockHt;
 
 		     // raising the third arm all the way
 		     while ( d > 0 )
@@ -222,7 +222,7 @@ class RobotControl
 			int armWidth = 1;
 			int armDepth = 0;
 			
-			int currentBar  = 0;
+			int barIndex  = 0;
 			int initSpace = 3;
 			int sourceHeight = 12;
 			int blockHeight = 3;
@@ -293,7 +293,7 @@ class RobotControl
 				 * STEP #5
 				 * */
 				// After it got the block, lift the arm...
-			     while (armDepth >= (armHeight - limitBarHeights[currentBar] - blockHeights[currentBlock]))
+			     while (armDepth >= (armHeight - limitBarHeights[barIndex] - blockHeights[currentBlock]))
 			     {
 			    	 armDepth--;
 			         r.raise();
@@ -322,8 +322,8 @@ class RobotControl
 			     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
 			     if(!lowestArmStatus)
 			     {
-			    	 System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
-				     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
+			    	 System.out.println((barHeights[barIndex] + blockHeights[currentBlock] + 2));
+				     while (armHeight >= (barHeights[barIndex] + blockHeights[currentBlock] + 2))
 				     {
 				    	 armHeight--;
 				    	 r.down();
@@ -332,8 +332,8 @@ class RobotControl
 			     }
 			     else
 			     {
-			    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
-			    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
+			    	 System.out.println((armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2));
+			    	 while (armDepth <= (armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2))
 			    	 {
 			    		 armDepth++;
 			    		 r.lower();
@@ -350,7 +350,7 @@ class RobotControl
 			     
 			     // Update source's height
 			     sourceHeight = sourceHeight - blockHeight;
-			     currentBar++;
+			     barIndex++;
 			}
 			
 			
@@ -364,7 +364,7 @@ class RobotControl
 					int armWidth = 1;
 					int armDepth = 0;
 					
-					int currentBar  = 0;
+					int barIndex  = 0;
 					int initSpace = 3;
 					int sourceHeight = 12;
 					int blockHeight = 3;
@@ -395,7 +395,7 @@ class RobotControl
 						else
 						{
 							System.out.println("Now depth is: " + armDepth);
-							while(armHeight <= blockHeights[currentBlock] + ascendedBarHeights[ascendedBarHeights.length - currentBar] - armDepth)
+							while(armHeight <= blockHeights[currentBlock] + ascendedBarHeights[ascendedBarHeights.length - barIndex] - armDepth)
 							{
 								armHeight++;
 								r.up();
@@ -405,7 +405,7 @@ class RobotControl
 						/*
 						 * STEP #2
 						 * */
-						while (armHeight < armDepth + barHeights[currentBar] + 1)
+						while (armHeight < armDepth + barHeights[barIndex] + 1)
 						{
 							armDepth--;
 					        r.raise();
@@ -468,8 +468,8 @@ class RobotControl
 					     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
 					     if(!lowestArmStatus)
 					     {
-					    	 System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
-						     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
+					    	 System.out.println((barHeights[barIndex] + blockHeights[currentBlock] + 2));
+						     while (armHeight >= (barHeights[barIndex] + blockHeights[currentBlock] + 2))
 						     {
 						    	 armHeight--;
 						    	 r.down();
@@ -478,8 +478,8 @@ class RobotControl
 					     }
 					     else
 					     {
-					    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
-					    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
+					    	 System.out.println((armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2));
+					    	 while (armDepth <= (armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2))
 					    	 {
 					    		 armDepth++;
 					    		 r.lower();
@@ -496,7 +496,7 @@ class RobotControl
 					     
 					     // Update source's height
 					     sourceHeight = sourceHeight - blockHeight;
-					     currentBar++;
+					     barIndex++;
 					}
 					
 					
@@ -505,21 +505,20 @@ class RobotControl
 	   public void controlMechanismForScenarioC(int barHeights[], int blockHeights[])
 	   {
 			// Initial variable declaration 
-			int armHeight = 2;
-			int armWidth = 1;
-			int armDepth = 0;
-			int currentBar  = 0;
-			int currentHugeBlock = 0; // Huge block means size-3 blocks
-			int rowOneHeight = 0;
-			int rowTwoHeight = 0;
-			int initSpace = 3;
-			int blockHeight = 3;
-			int extendLength = 9; // First-time extension of the arm
-			int reverseBlockIndex = blockHeights.length - 1; // Used as a reverse index of block array.
-			boolean firstRound = true;
-			boolean lowestArmStatus = false;
-			boolean partAB = true;
-			int[] ascendedBarHeights = new int[20];
+			int armHeight = 2;									// Initial arm height
+			int armWidth = 1;									// Initial arm width
+			int armDepth = 0;									// Initial arm depth
+			int barIndex  = 0;									// Bar index
+			int hugeBlockIndex = 0; 							// Huge block means size-3 blocks
+			int rowOneHeight = 0;								// Height counter for row one
+			int rowTwoHeight = 0;								// Height counter for row two
+			int initSpace = 3;									// Initial space (used in Stage A and B)	
+			int extendLength = 9; 								// First-time extension of the arm
+			int reverseBlockIndex = blockHeights.length - 1; 	// Used as a reverse index of block array.
+			boolean firstRound = true;							// Used for judging if it's the first round
+			boolean lowestArmStatus = false;					// Used for judging if the arm it's in the lowest allowance
+			boolean stageAB = true;								// Used for detecting if it's running Stage A and/or B
+			int[] ascendedBarHeights = new int[20];				// Create an ascended bar height array (for judging which bar is the highest one)
 			
 			if(blockHeights.length >= barHeights.length)
 			{
@@ -557,11 +556,11 @@ class RobotControl
 			
 			if(blockHeights[0] == 3 && blockHeights[1] == 3)
 			{
-				partAB = true;
+				stageAB = true;
 			}
 			else
 			{
-				partAB = false;
+				stageAB = false;
 			}
 			
 			for(int currentBlock = 0; currentBlock <= (blockHeights.length - 1); currentBlock++) // Four block, so it should be 4
@@ -583,7 +582,7 @@ class RobotControl
 				else
 				{
 					System.out.println("Now depth is: " + armDepth);
-					while(armHeight <= blockHeights[reverseBlockIndex] + ascendedBarHeights[ascendedBarHeights.length - currentBar] - armDepth)
+					while(armHeight <= blockHeights[reverseBlockIndex] + ascendedBarHeights[ascendedBarHeights.length - barIndex] - armDepth)
 					{
 						armHeight++;
 						r.up();
@@ -593,9 +592,9 @@ class RobotControl
 				/*
 				 * STEP #2
 				 * */
-				if(partAB)
+				if(stageAB)
 				{
-					while (armHeight < armDepth + barHeights[currentBar] + 1)
+					while (armHeight < armDepth + barHeights[barIndex] + 1)
 					{
 						armDepth--;
 				        r.raise();
@@ -638,7 +637,7 @@ class RobotControl
 				
 			     // If it's NOT stage A or B, then raise the arm to highest
 			     // to avoid collision.
-			     if(!partAB)
+			     if(!stageAB)
 			     {
 			    	 while(armDepth > 0)
 				     {
@@ -664,7 +663,7 @@ class RobotControl
 			      * STEP #6
 					 * */
 			     // Move to where it needs to
-			     if(partAB)
+			     if(stageAB)
 			     {
 			    	 while ((armWidth - initSpace - currentBlock) > 0 )
 				     {
@@ -680,7 +679,7 @@ class RobotControl
 			    	 	case 3:
 			    	 	{
 			    	 		System.out.println("Huge Block detected!");
-					    	 while ((armWidth - currentHugeBlock - 3) > 0 )
+					    	 while ((armWidth - hugeBlockIndex - 3) > 0 )
 						     {
 						    	 armWidth--;
 						         r.contract();
@@ -718,12 +717,12 @@ class RobotControl
 			     // Now move down to the target
 			     // We need to detect the arm is in the lowest allowance or not.
 			     // It can't be too high or too low, otherwise it will be stuck or use more steps than expected.
-			     if(partAB)
+			     if(stageAB)
 			     {
 				     if(!lowestArmStatus)
 				     {
-				    	// System.out.println((barHeights[currentBar] + blockHeights[currentBlock] + 2));
-					     while (armHeight >= (barHeights[currentBar] + blockHeights[currentBlock] + 2))
+				    	// System.out.println((barHeights[barIndex] + blockHeights[currentBlock] + 2));
+					     while (armHeight >= (barHeights[barIndex] + blockHeights[currentBlock] + 2))
 					     {
 					    	 armHeight--;
 					    	 r.down();
@@ -732,8 +731,8 @@ class RobotControl
 				     }
 				     else
 				     {
-				    	 System.out.println((armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2));
-				    	 while (armDepth <= (armHeight - (barHeights[currentBar] + blockHeights[currentBlock]) - 2))
+				    	 System.out.println((armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2));
+				    	 while (armDepth <= (armHeight - (barHeights[barIndex] + blockHeights[currentBlock]) - 2))
 				    	 {
 				    		 armDepth++;
 				    		 r.lower();
@@ -746,7 +745,7 @@ class RobotControl
 			    	{
 			    		case 3:
 			    		{
-					    	 while (armDepth <= (armHeight - (barHeights[currentHugeBlock] + blockHeights[reverseBlockIndex]) - 2))
+					    	 while (armDepth <= (armHeight - (barHeights[hugeBlockIndex] + blockHeights[reverseBlockIndex]) - 2))
 					    	 {
 					    		 armDepth++;
 					    		 r.lower();
@@ -791,13 +790,13 @@ class RobotControl
 			     
 			     // Update source's height
 			     sourceHeight = sourceHeight - blockHeights[reverseBlockIndex];
-			     currentBar++;
+			     barIndex++;
 			     
 			     // Plus 1 only if it's a huge block
 			     if(blockHeights[reverseBlockIndex] == 3)
 			     {
 			    	 System.out.println("Huge block index +1");
-			    	 currentHugeBlock++;
+			    	 hugeBlockIndex++;
 			     }
 			     
 			     reverseBlockIndex--;
